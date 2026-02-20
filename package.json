@@ -1,0 +1,45 @@
+{
+  "name": "serveflow",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "homepage": "./",
+  "scripts": {
+    "dev": "vite",
+    "tauri:dev": "npx tauri dev",
+    "build": "vite build",
+    "tauri:build": "npx tauri build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "deploy": "node scripts/deploy.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.97.0",
+    "@tauri-apps/api": "^2.0.0",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
+    "lucide-react": "^0.563.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.13.0",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@tauri-apps/cli": "^2.0.0",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "autoprefixer": "^10.4.24",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "vite": "^7.2.4"
+  },
+  "privateConfig": {
+    "note": "Build configuration is now in src-tauri/tauri.conf.json. Electron build config removed."
+  }
+}
