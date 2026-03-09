@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Build and Deploy to cPanel
 
 on:
   push:
@@ -6,33 +6,39 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
+    name: 🏗️ Build & 🚀 Deploy
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
-      # Use this instead of ssh-action
-      - name: 🚀 Sync files via FTP
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Match this to your local version
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🏗️ Build Project
+        run: npm run build
+
+      - name: 📂 Sync files via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          # The local folder created by 'npm run build'
           local-dir: ./dist/ 
+          # The destination on your cPanel server
           server-dir: public_html/
-          # This ensures old files are removed so the server stays clean
+          # Change to true if you want to delete old files on server
           delete-destination: false 
-
-      # OPTIONAL: If you need to tell cPanel to restart the Node app
-      - name: 🔄 Trigger App Restart
-        uses: appleboy/ssh-action@v1.0.0
-        continue-on-error: true # This prevents the whole build from failing if SSH is still blocked
-        with:
-          host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22 # or your discovered SSH port
-          script: |
-            cd public_html
-            touch tmp/restart.txt
+          # Optional: exclude files you don't want to upload
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
