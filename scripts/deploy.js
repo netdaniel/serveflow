@@ -3,9 +3,10 @@
  * Run this script to build and deploy the application
  */
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
 
 console.log('🚀 Starting RosterFlow deployment...\n');
 
@@ -19,7 +20,7 @@ try {
   console.log('✅ Package.json found');
 
   // Load environment variables
-  require('dotenv').config({ path: '.env' });
+  dotenv.config({ path: '.env' });
 
   // Build the application
   console.log('📦 Building application...');
@@ -43,8 +44,10 @@ try {
   console.log('   - HOST (your server IP/domain)');
   console.log('   - USERNAME (server username)');
   console.log('   - SSH_PRIVATE_KEY (your private SSH key)');
+  console.log('   - SSH_PORT (optional, default 22; use 2222 for custom port)');
   console.log('\n3. Push to main branch to trigger deployment');
-  console.log('\nAlternatively, you can manually copy the dist folder to your server.');
+  console.log('\nAlternatively, you can manually copy the dist folder to your server:');
+  console.log('   scp -P 2222 -r dist/ username@your-server:/var/www/rosterflow/');
 
   console.log('\n🎉 Deployment script completed!');
 } catch (error) {

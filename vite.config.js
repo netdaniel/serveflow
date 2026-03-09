@@ -1,9 +1,23 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/',
+  server: {
+    hmr: {
+      overlay: true
+    },
+    fs: {
+      // Allow serving files from the project root
+      allow: ['.']
+    }
+  },
+  build: {
+    // Ensure proper MIME types in production
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      }
+    }
+  }
 })
-

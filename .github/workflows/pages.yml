@@ -13,7 +13,7 @@ permissions:
 # Allow only one concurrent deployment
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
@@ -49,6 +49,7 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: './dist'
+        name: github-pages-${{ github.run_number }}
 
     - name: Deploy to GitHub Pages
       id: deployment

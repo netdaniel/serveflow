@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, Calendar, Settings, LogOut, ShieldCheck } from 'lucide-react';
+import { Layout as LayoutIcon, Users, Calendar, Settings, LogOut, ShieldCheck } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { useStore } from '../services/store';
 
 const NAV_ITEMS = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    { icon: LayoutIcon, label: 'Dashboard', path: '/' },
     { icon: Users, label: 'Volunteers', path: '/volunteers' },
     { icon: Calendar, label: 'Schedule', path: '/schedule' },
     { icon: Settings, label: 'Areas', path: '/roles' },
