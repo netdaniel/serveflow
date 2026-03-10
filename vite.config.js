@@ -3,17 +3,12 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  server: {
-    hmr: {
-      overlay: true
-    },
-    fs: {
-      // Allow serving files from the project root
-      allow: ['.']
-    }
-  },
+  // Crucial for cPanel: Ensures assets use relative paths
+  base: './', 
   build: {
-    // Ensure proper MIME types in production
+    // This ensures your assets go into an 'assets' folder inside 'dist'
+    outDir: 'dist',
+    assetsDir: 'assets',
     rollupOptions: {
       output: {
         manualChunks: undefined,

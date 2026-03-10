@@ -16,7 +16,6 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Match this to your local version
           cache: 'npm'
 
       - name: 📦 Install dependencies
@@ -31,14 +30,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # The local folder created by 'npm run build'
           local-dir: ./dist/ 
-          # The destination on your cPanel server
-          server-dir: public_html/
-          # Change to true if you want to delete old files on server
-          delete-destination: false 
-          # Optional: exclude files you don't want to upload
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
+          # Use the absolute path from your login root
+          server-dir: ./public_html/ 
+          # Use 'ftp' to avoid TLS handshake errors in the runner
+          protocol: ftp
