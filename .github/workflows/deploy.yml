@@ -28,12 +28,30 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         
-      - name: 📂 Sync files via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Copy build files via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/ 
-          server-dir: ./ 
-          protocol: ftp
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/*"
+          target: "/var/www/rosterflow"
+          strip_components: 1
+
+      - name: Execute post-deploy scripts via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Navigate to app directory
+            cd /var/www/rosterflow
+            
+            # Restart web server if using nginx
+            sudo systemctl reload nginx || echo "Nginx not found, skipping reload"
+            
+            # Or restart PM2 if using PM2
+            pm2 reload rosterflow || echo "PM2 not found, skipping reload"
+            
+            echo "Deployment completed successfully!"
