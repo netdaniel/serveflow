@@ -31,8 +31,8 @@ jobs:
       - name: Copy build files via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "dist/*"
           target: "/var/www/rosterflow"
@@ -41,8 +41,8 @@ jobs:
       - name: Execute post-deploy scripts via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # Navigate to app directory
