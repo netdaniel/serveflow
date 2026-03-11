@@ -34,6 +34,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT || '21098' }}
           source: "dist/*"
           target: "/var/www/rosterflow"
           strip_components: 1
@@ -44,6 +45,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.PORT || '21098' }}
           script: |
             # Navigate to app directory
             cd /var/www/rosterflow
