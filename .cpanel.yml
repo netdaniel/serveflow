@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/serveflow/public_html/
+    - export DEPLOYPATH=/home/serveflo/public_html/
     - /bin/cp -R dist/* $DEPLOYPATH
