@@ -120,28 +120,44 @@ export function StoreProvider({ children }) {
 
     const loadProfile = async () => {
         try {
-            const { data, error } = await supabase
+            // First try to get profile without organization join (to avoid 406 errors)
+            const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
-                .select('*, organizations(*)')
+                .select('*')
                 .eq('id', session.user.id)
                 .single();
 
-            if (error) {
-                if (error.code === 'PGRST116') {
+            if (profileError) {
+                if (profileError.code === 'PGRST116') {
                     // Profile doesn't exist yet - this is expected for new users
                     console.log('Profile not found for user, redirecting to registration');
-                    // For new users, we need to create a profile - redirect to registration
                     setProfile(null);
                     setOrganization(null);
                     return;
                 } else {
-                    console.error('Error loading profile:', error);
+                    console.error('Error loading profile:', profileError);
                     return;
                 }
             }
 
-            setProfile(data);
-            setOrganization(data?.organizations || null);
+            setProfile(profileData);
+
+            // If profile has org_id, try to load organization separately
+            if (profileData?.org_id) {
+                const { data: orgData, error: orgError } = await supabase
+                    .from('organizations')
+                    .select('*')
+                    .eq('id', profileData.org_id)
+                    .single();
+                
+                if (!orgError && orgData) {
+                    setOrganization(orgData);
+                } else {
+                    setOrganization(null);
+                }
+            } else {
+                setOrganization(null);
+            }
         } catch (err) {
             console.error('Unexpected error loading profile:', err);
         }
