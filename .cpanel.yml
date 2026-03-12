@@ -1,7 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/serveflo/public_html/
-    - /usr/local/bin/npm install || npm install
-    - /usr/local/bin/npm run build || npm run build
-    - /bin/cp -a dist/. $DEPLOYPATH
+    - export DEPLOYPATH=/home/serveflow/public_html/
+    - /bin/cp -R dist/* $DEPLOYPATH
