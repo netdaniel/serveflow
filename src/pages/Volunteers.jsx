@@ -5,7 +5,7 @@ import { cn } from '../utils/cn';
 import { Modal } from '../components/Modal';
 
 export function Volunteers() {
-    const { volunteers, roles, groups, addVolunteer, updateVolunteer, deleteVolunteer } = useStore();
+    const { volunteers, roles, groups, addVolunteer, updateVolunteer, deleteVolunteer, canEdit } = useStore();
     const [filter, setFilter] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null);
@@ -127,33 +127,35 @@ export function Volunteers() {
                     <h1 className="text-2xl font-bold text-navy-500">Volunteers</h1>
                     <p className="text-navy-400">Manage your team members and their roles</p>
                 </div>
-                <div className="flex gap-3">
-                    <input
-                        type="file"
-                        accept=".csv"
-                        ref={fileInputRef}
-                        onChange={handleFileUpload}
-                        className="hidden"
-                    />
-                    <button
-                        onClick={() => fileInputRef.current.click()}
-                        className="flex items-center gap-2 px-4 py-2 border border-navy-200 text-navy-500 rounded-xl hover:bg-navy-50 transition-colors font-medium shadow-sm active:scale-95 transform duration-100 bg-white"
-                    >
-                        <Upload size={20} />
-                        Import CSV
-                    </button>
-                    <button
-                        onClick={() => {
-                            setEditingId(null);
-                            setFormData({ name: '', email: '', phone: '', roleIds: [] });
-                            setIsModalOpen(true);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium shadow-sm active:scale-95 transform duration-100"
-                    >
-                        <Plus size={20} />
-                        Add Volunteer
-                    </button>
-                </div>
+                {canEdit && (
+                    <div className="flex gap-3">
+                        <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileUpload}
+                            className="hidden"
+                        />
+                        <button
+                            onClick={() => fileInputRef.current.click()}
+                            className="flex items-center gap-2 px-4 py-2 border border-navy-200 text-navy-500 rounded-xl hover:bg-navy-50 transition-colors font-medium shadow-sm active:scale-95 transform duration-100 bg-white"
+                        >
+                            <Upload size={20} />
+                            Import CSV
+                        </button>
+                        <button
+                            onClick={() => {
+                                setEditingId(null);
+                                setFormData({ name: '', email: '', phone: '', roleIds: [] });
+                                setIsModalOpen(true);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium shadow-sm active:scale-95 transform duration-100"
+                        >
+                            <Plus size={20} />
+                            Add Volunteer
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-navy-100 overflow-hidden">
@@ -216,20 +218,24 @@ export function Volunteers() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <div className="flex items-center justify-end gap-3">
-                                            <button
-                                                onClick={() => handleEdit(volunteer)}
-                                                className="text-primary-500 hover:text-primary-600 font-medium text-sm"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(volunteer.id)}
-                                                className="text-coral-500 hover:text-coral-600 font-medium text-sm"
-                                            >
-                                                Remove
-                                            </button>
-                                        </div>
+                                        {canEdit ? (
+                                            <div className="flex items-center justify-end gap-3">
+                                                <button
+                                                    onClick={() => handleEdit(volunteer)}
+                                                    className="text-primary-500 hover:text-primary-600 font-medium text-sm"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(volunteer.id)}
+                                                    className="text-coral-500 hover:text-coral-600 font-medium text-sm"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <span className="text-navy-300 text-sm">View Only</span>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

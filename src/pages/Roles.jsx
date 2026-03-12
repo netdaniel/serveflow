@@ -4,7 +4,7 @@ import { Search, Plus, Trash2, Edit2, Layers, Folder, Settings } from 'lucide-re
 import { Modal } from '../components/Modal';
 
 export function Roles() {
-    const { roles, groups, addRole, updateRole, deleteRole, addGroup, updateGroup, deleteGroup } = useStore();
+    const { roles, groups, addRole, updateRole, deleteRole, addGroup, updateGroup, deleteGroup, canEdit } = useStore();
     const [filter, setFilter] = useState('');
 
     // Role Modal State
@@ -117,26 +117,28 @@ export function Roles() {
                     <h1 className="text-2xl font-bold text-navy-500">Areas & Roles</h1>
                     <p className="text-navy-400">Manage the different areas/teams where volunteers can serve</p>
                 </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => setIsGroupManagementOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 border border-navy-200 text-navy-500 rounded-xl hover:bg-navy-50 transition-colors font-medium shadow-sm active:scale-95 transform duration-100 bg-white"
-                    >
-                        <Settings size={20} />
-                        Manage Teams
-                    </button>
-                    <button
-                        onClick={() => {
-                            setEditingRoleId(null);
-                            setRoleFormData({ name: '', groupId: '' });
-                            setIsRoleModalOpen(true);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium shadow-sm active:scale-95 transform duration-100"
-                    >
-                        <Plus size={20} />
-                        Add Role
-                    </button>
-                </div>
+                {canEdit && (
+                    <div className="flex gap-3">
+                        <button
+                            onClick={() => setIsGroupManagementOpen(true)}
+                            className="flex items-center gap-2 px-4 py-2 border border-navy-200 text-navy-500 rounded-xl hover:bg-navy-50 transition-colors font-medium shadow-sm active:scale-95 transform duration-100 bg-white"
+                        >
+                            <Settings size={20} />
+                            Manage Teams
+                        </button>
+                        <button
+                            onClick={() => {
+                                setEditingRoleId(null);
+                                setRoleFormData({ name: '', groupId: '' });
+                                setIsRoleModalOpen(true);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium shadow-sm active:scale-95 transform duration-100"
+                        >
+                            <Plus size={20} />
+                            Add Role
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-navy-100 overflow-hidden">
@@ -184,20 +186,24 @@ export function Roles() {
                                                 {getGroupName(role.groupId)}
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <div className="flex items-center justify-end gap-3">
-                                                    <button
-                                                        onClick={() => handleEditRole(role)}
-                                                        className="p-2 text-navy-300 hover:text-primary-500 hover:bg-primary-50 rounded-full transition-colors"
-                                                    >
-                                                        <Edit2 size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteRole(role.id)}
-                                                        className="p-2 text-navy-300 hover:text-coral-500 hover:bg-coral-50 rounded-full transition-colors"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </div>
+                                                {canEdit ? (
+                                                    <div className="flex items-center justify-end gap-3">
+                                                        <button
+                                                            onClick={() => handleEditRole(role)}
+                                                            className="p-2 text-navy-300 hover:text-primary-500 hover:bg-primary-50 rounded-full transition-colors"
+                                                        >
+                                                            <Edit2 size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteRole(role.id)}
+                                                            className="p-2 text-navy-300 hover:text-coral-500 hover:bg-coral-50 rounded-full transition-colors"
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-navy-300 text-sm">View Only</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

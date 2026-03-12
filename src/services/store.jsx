@@ -1210,12 +1210,23 @@ export function StoreProvider({ children }) {
             orgId: profile?.org_id
         } : null);
 
+    // Role-based access control helpers
+    const isAdmin = profile?.role === 'admin' || demoMode;
+    const isTeamMember = profile?.role === 'member' || profile?.role === 'team_member';
+    const canEdit = isAdmin;
+    const canDownload = true; // All authenticated users can download
+
     const value = {
         user,
         profile,
         organization,
         loading,
         demoMode,
+        // Role-based access
+        isAdmin,
+        isTeamMember,
+        canEdit,
+        canDownload,
         login,
         logout,
         registerOrganization,

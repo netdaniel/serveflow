@@ -4,18 +4,20 @@ import { Layout as LayoutIcon, Users, Calendar, Settings, LogOut, ShieldCheck } 
 import { cn } from '../utils/cn';
 import { useStore } from '../services/store';
 
-const NAV_ITEMS = [
-    { icon: LayoutIcon, label: 'Dashboard', path: '/' },
-    { icon: Users, label: 'Volunteers', path: '/volunteers' },
-    { icon: Calendar, label: 'Schedule', path: '/schedule' },
-    { icon: Settings, label: 'Areas', path: '/roles' },
-    { icon: ShieldCheck, label: 'Manage Members', path: '/manage-members' },
-];
-
 export function Layout() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { user, profile, organization, logout, demoMode } = useStore();
+    const { user, profile, organization, logout, demoMode, canEdit } = useStore();
+
+    // Filter nav items based on user role
+    const navItems = [
+        { icon: LayoutIcon, label: 'Dashboard', path: '/' },
+        { icon: Users, label: 'Volunteers', path: '/volunteers' },
+        { icon: Calendar, label: 'Schedule', path: '/schedule' },
+        { icon: Settings, label: 'Areas', path: '/roles' },
+        // Only show Manage Members for admins
+        ...(canEdit ? [{ icon: ShieldCheck, label: 'Manage Members', path: '/manage-members' }] : []),
+    ];
 
     useEffect(() => {
         if (!user) {
@@ -55,7 +57,7 @@ export function Layout() {
                 </div>
 
                 <nav className="flex-1 px-4 space-y-2">
-                    {NAV_ITEMS.map((item) => {
+                    {navItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = location.pathname === item.path;
 

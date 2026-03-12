@@ -7,7 +7,7 @@ import FileUpload from '../components/FileUpload';
 import MusicPlaylist from '../components/MusicPlaylist';
 
 export function Schedule() {
-    const { events, assignments, roles, volunteers, assignVolunteer, addEvent, updateEvent, deleteEvent, groups, updateAssignment, getFileAttachments, getEventPlaylists, loading } = useStore();
+    const { events, assignments, roles, volunteers, assignVolunteer, addEvent, updateEvent, deleteEvent, groups, updateAssignment, getFileAttachments, getEventPlaylists, loading, canEdit } = useStore();
     
     // Track assignment length to force re-render when assignments change
     const assignmentCount = assignments.length;
@@ -410,17 +410,19 @@ export function Schedule() {
                     <p className="text-navy-400">Manage upcoming services and assignments</p>
                     <p className="text-xs text-navy-300 mt-1">Select events to share via WhatsApp, Email, or Print.</p>
                 </div>
-                <button
-                    onClick={() => {
-                        setEditingEventId(null);
-                        setFormData({ title: '', date: '', time: '' });
-                        setIsEventModalOpen(true);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium shadow-sm"
-                >
-                    <CalendarIcon size={20} />
-                    Add Event
-                </button>
+                {canEdit && (
+                    <button
+                        onClick={() => {
+                            setEditingEventId(null);
+                            setFormData({ title: '', date: '', time: '' });
+                            setIsEventModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium shadow-sm"
+                    >
+                        <CalendarIcon size={20} />
+                        Add Event
+                    </button>
+                )}
             </div>
 
             <div className="space-y-4">
@@ -504,20 +506,24 @@ export function Schedule() {
                                             ></div>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={(e) => handleEditEvent(e, event)}
-                                        className="p-2 text-navy-300 hover:text-primary-500 hover:bg-primary-50 rounded-full transition-colors"
-                                        title="Edit Event"
-                                    >
-                                        <Edit2 size={20} />
-                                    </button>
-                                    <button
-                                        onClick={(e) => handleDeleteEvent(e, event.id)}
-                                        className="p-2 text-navy-300 hover:text-coral-500 hover:bg-coral-50 rounded-full transition-colors"
-                                        title="Delete Event"
-                                    >
-                                        <Trash2 size={20} />
-                                    </button>
+                                    {canEdit && (
+                                        <>
+                                            <button
+                                                onClick={(e) => handleEditEvent(e, event)}
+                                                className="p-2 text-navy-300 hover:text-primary-500 hover:bg-primary-50 rounded-full transition-colors"
+                                                title="Edit Event"
+                                            >
+                                                <Edit2 size={20} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => handleDeleteEvent(e, event.id)}
+                                                className="p-2 text-navy-300 hover:text-coral-500 hover:bg-coral-50 rounded-full transition-colors"
+                                                title="Delete Event"
+                                            >
+                                                <Trash2 size={20} />
+                                            </button>
+                                        </>
+                                    )}
                                     <ChevronRight size={20} className={cn("text-navy-300 transition-transform", isExpanded && "rotate-90")} />
                                 </div>
                             </div>
@@ -593,13 +599,19 @@ export function Schedule() {
                                                                                 </div>
                                                                             </div>
                                                                         ) : (
-                                                                            <button
-                                                                                onClick={() => handleAssignClick(event.id, role.id)}
-                                                                                className="w-full py-2 border border-dashed border-navy-300 rounded-lg text-navy-500 text-sm hover:border-primary-400 hover:text-primary-500 hover:bg-primary-50 transition-colors flex items-center justify-center gap-2"
-                                                                            >
-                                                                                <UserPlus size={16} />
-                                                                                Assign Volunteer
-                                                                            </button>
+                                                                            canEdit ? (
+                                                                                <button
+                                                                                    onClick={() => handleAssignClick(event.id, role.id)}
+                                                                                    className="w-full py-2 border border-dashed border-navy-300 rounded-lg text-navy-500 text-sm hover:border-primary-400 hover:text-primary-500 hover:bg-primary-50 transition-colors flex items-center justify-center gap-2"
+                                                                                >
+                                                                                    <UserPlus size={16} />
+                                                                                    Assign Volunteer
+                                                                                </button>
+                                                                            ) : (
+                                                                                <div className="w-full py-2 border border-dashed border-navy-200 rounded-lg text-navy-300 text-sm flex items-center justify-center gap-2">
+                                                                                    <span>Unassigned</span>
+                                                                                </div>
+                                                                            )
                                                                         )}
                                                                     </div>
                                                                 );
@@ -637,13 +649,19 @@ export function Schedule() {
                                                                             </div>
                                                                         </div>
                                                                     ) : (
-                                                                        <button
-                                                                            onClick={() => handleAssignClick(event.id, role.id)}
-                                                                            className="w-full py-2 border border-dashed border-navy-300 rounded-lg text-navy-500 text-sm hover:border-primary-400 hover:text-primary-500 hover:bg-primary-50 transition-colors flex items-center justify-center gap-2"
-                                                                        >
-                                                                            <UserPlus size={16} />
-                                                                            Assign Volunteer
-                                                                        </button>
+                                                                        canEdit ? (
+                                                                            <button
+                                                                                onClick={() => handleAssignClick(event.id, role.id)}
+                                                                                className="w-full py-2 border border-dashed border-navy-300 rounded-lg text-navy-500 text-sm hover:border-primary-400 hover:text-primary-500 hover:bg-primary-50 transition-colors flex items-center justify-center gap-2"
+                                                                            >
+                                                                                <UserPlus size={16} />
+                                                                                Assign Volunteer
+                                                                            </button>
+                                                                        ) : (
+                                                                            <div className="w-full py-2 border border-dashed border-navy-200 rounded-lg text-navy-300 text-sm flex items-center justify-center gap-2">
+                                                                                <span>Unassigned</span>
+                                                                            </div>
+                                                                        )
                                                                     )}
                                                                 </div>
                                                             );

@@ -4,7 +4,24 @@ import { UserCheck, UserX, Clock, Search } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
 export function ManageMembers() {
-    const { profile, updateMemberStatus, demoMode } = useStore();
+    const { profile, updateMemberStatus, demoMode, canEdit } = useStore();
+
+    // Only admins can manage members
+    if (!canEdit) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                    <div className="text-navy-300 mb-4">
+                        <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-xl font-bold text-navy-500 mb-2">Admin Access Required</h2>
+                    <p className="text-navy-400">Only administrators can manage team members.</p>
+                </div>
+            </div>
+        );
+    }
     const [pendingMembers, setPendingMembers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
