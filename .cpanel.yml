@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/serveflo/public_html/
+    - npm install
+    - npm run build
+    - cp -R dist/* $DEPLOYPATH
