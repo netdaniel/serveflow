@@ -384,13 +384,41 @@ export function StoreProvider({ children }) {
                 }
             }
 
-            // 5. Update session and load profile
+            // 5. Trigger welcome email via Edge Function
+            try {
+                await sendWelcomeEmail({
+                    orgId: orgData.id,
+                    adminEmail: email,
+                    adminName: adminName,
+                    orgName: orgName
+                });
+            } catch (emailErr) {
+                console.error('Failed to send welcome email:', emailErr);
+                // Don't throw - registration should succeed even if email fails
+            }
+
+            // 6. Update session and load profile
             const { data: { session } } = await supabase.auth.getSession();
             setSession(session);
             await loadProfile();
         } catch (error) {
             console.error('Registration error:', error);
             throw error;
+        }
+    };
+
+    // Send welcome email via Edge Function
+    const sendWelcomeEmail = async ({ orgId, adminEmail, adminName, orgName }) => {
+        try {
+            const { data, error } = await supabase.functions.invoke('send-welcome-email', {
+                body: { orgId, adminEmail, adminName, orgName }
+            });
+
+            if (error) throw error;
+            return data;
+        } catch (err) {
+            console.error('Error invoking welcome email function:', err);
+            throw err;
         }
     };
 

@@ -21,11 +21,12 @@
 
 ## Update Summary
 **Changes Made**
-- Updated navigation filtering section to document role-based menu item visibility
-- Added documentation for the `canEdit` property and its role in determining navigation access
-- Enhanced security model documentation to explain admin vs team member permissions
-- Updated component composition patterns to reflect role-aware navigation
-- Added examples for extending navigation with role-based access control
+- Updated to reflect comprehensive responsive mobile navigation system implementation
+- Added documentation for dual-sidebar architecture with desktop and mobile views
+- Documented mobile drawer with slide-out effects and state management
+- Enhanced documentation for hamburger menu functionality and mobile navigation
+- Updated component composition patterns to include mobile-responsive design
+- Added examples for extending the responsive layout system
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -41,14 +42,15 @@
 
 ## Introduction
 This document explains RosterFlow's layout system architecture with a focus on:
-- The main Layout component structure, including sidebar navigation, header, and responsive design
+- The main Layout component structure, including dual-sidebar architecture with desktop and mobile navigation
+- Comprehensive responsive design implementation with mobile drawer and slide-out effects
 - Dynamic navigation filtering based on user roles with administrative users seeing full access and team members seeing restricted navigation
 - The navigation items array and how routes are dynamically matched for active states
 - The AuthLayout component for authentication-required pages and its role in redirecting unauthenticated users
 - Component composition patterns, prop handling, and integration with React Router
 - Styling approaches using Tailwind CSS and the cn utility function
 - Mobile responsiveness, accessibility features, and user session management
-- Practical examples for extending the layout system and customizing navigation with role-based access control
+- Practical examples for extending the responsive layout system and customizing navigation with role-based access control
 
 ## Project Structure
 RosterFlow organizes layout-related code under src/components and integrates with routing in src/App.jsx. Pages are located under src/pages and share a common store for authentication, data, and role-based access control.
@@ -97,7 +99,7 @@ AuthLayout --> CN
 **Diagram sources**
 - [App.jsx:1-43](file://src/App.jsx#L1-L43)
 - [AuthLayout.jsx:1-26](file://src/components/AuthLayout.jsx#L1-L26)
-- [Layout.jsx:1-129](file://src/components/Layout.jsx#L1-L129)
+- [Layout.jsx:1-194](file://src/components/Layout.jsx#L1-L194)
 - [store.jsx:1-1279](file://src/services/store.jsx#L1-L1279)
 - [cn.js:1-7](file://src/utils/cn.js#L1-L7)
 
@@ -105,7 +107,7 @@ AuthLayout --> CN
 - [App.jsx:1-43](file://src/App.jsx#L1-L43)
 
 ## Core Components
-- Layout.jsx: Provides the main application shell with a persistent sidebar, header, and outlet for routed pages. It dynamically filters navigation items based on user roles using the `canEdit` property and manages logout.
+- Layout.jsx: Provides the main application shell with dual-sidebar architecture - a persistent desktop sidebar and mobile drawer with slide-out effects. It dynamically filters navigation items based on user roles using the `canEdit` property and manages logout.
 - AuthLayout.jsx: Wraps authentication pages (Landing, Login, Register) with a minimal header and footer, ensuring non-authenticated users see the auth flow.
 - cn utility: Merges Tailwind classes safely using clsx and tailwind-merge to avoid conflicts.
 - store.jsx: Centralized authentication and data store, exposing user, organization, role-based access control properties like `canEdit`, and actions like logout.
@@ -116,6 +118,7 @@ Key responsibilities:
 - Routing: React Router nests AuthLayout and Layout around their respective pages.
 - Styling: Tailwind utilities and cn compose styles consistently.
 - Session: Layout redirects to landing when user is missing; store manages auth state and data.
+- **Updated**: Responsive mobile navigation with dual-sidebar architecture and state management.
 
 **Section sources**
 - [Layout.jsx:7-20](file://src/components/Layout.jsx#L7-L20)
@@ -126,7 +129,7 @@ Key responsibilities:
 - [store.jsx:113-124](file://src/services/store.jsx#L113-L124)
 
 ## Architecture Overview
-The layout system separates authenticated and unauthenticated flows with role-based access control. AuthLayout handles public pages, while Layout provides the admin shell with dynamic navigation filtering. Both rely on the shared store for user/session state, role determination, and use cn for consistent Tailwind class merging.
+The layout system separates authenticated and unauthenticated flows with role-based access control. AuthLayout handles public pages, while Layout provides the admin shell with dynamic navigation filtering. Both rely on the shared store for user/session state, role determination, and use cn for consistent Tailwind class merging. **Updated**: The system now features comprehensive responsive design with dual-sidebar architecture.
 
 ```mermaid
 sequenceDiagram
@@ -149,6 +152,9 @@ else user missing
 Layout->>Router : navigate("/landing")
 Router-->>Browser : Redirect to Landing
 end
+note over Layout : Mobile View
+Layout->>Browser : Show mobile drawer with slide-out effect
+Layout->>Browser : Hamburger menu for mobile navigation
 ```
 
 **Diagram sources**
@@ -159,19 +165,29 @@ end
 ## Detailed Component Analysis
 
 ### Layout Component
+**Updated**: The Layout component now features comprehensive responsive mobile navigation system with dual-sidebar architecture.
+
 Responsibilities:
-- Dynamically filter NAV_ITEMS based on user role using the `canEdit` property
-- Compute active state based on current pathname
-- Provide header with user info and sign-out
-- Render Outlet for nested pages
-- Redirect to landing when user is absent
+- **Desktop Sidebar**: Persistent sidebar visible on large screens with logo, navigation items, and logout functionality
+- **Mobile Drawer**: Slide-out drawer for mobile devices with overlay background and smooth transitions
+- **State Management**: Uses React hooks to manage mobile menu state and route changes
+- **Responsive Design**: Implements lg breakpoint for desktop vs mobile layouts
+- **Dynamic Navigation Filtering**: Filters NAV_ITEMS based on user role using the `canEdit` property
+- **Active State Computation**: Computes active state based on current pathname
+- **Header with User Info**: Displays current page label and user information
+- **Outlet Rendering**: Renders nested pages within the main content area
+- **Session Management**: Redirects to landing when user is absent
 
 Implementation highlights:
-- Uses Lucide icons for each nav item
-- Active link styling uses cn to merge conditional classes
-- Header displays current page label derived from NAV_ITEMS
-- Logout triggers store.logout and navigates to landing
-- **Updated**: Navigation items are conditionally rendered based on role-based access control
+- **Dual Sidebar Architecture**: Desktop sidebar uses `hidden lg:flex` classes, mobile drawer uses `lg:hidden` classes
+- **Mobile Drawer Effects**: Slide-out animation using `transform transition-transform duration-300` classes
+- **Overlay Background**: Semi-transparent overlay behind mobile drawer for better UX
+- **Hamburger Menu**: Mobile menu button with Menu icon and click handler
+- **Lucide Icons**: Uses Lucide icons for each nav item with proper sizing
+- **Active Link Styling**: Uses cn to merge conditional classes for active and hover states
+- **Header Display**: Shows current page label derived from NAV_ITEMS
+- **Logout Functionality**: Triggers store.logout and navigates to landing
+- **Route Change Handling**: Closes mobile menu when route changes
 
 ```mermaid
 flowchart TD
@@ -182,7 +198,10 @@ CheckRole --> |true| BuildFullNav["Build full NAV_ITEMS (with Manage Members)"]
 CheckRole --> |false| BuildRestrictedNav["Build restricted NAV_ITEMS (without Manage Members)"]
 BuildFullNav --> ActiveState["Compute isActive from pathname"]
 BuildRestrictedNav --> ActiveState
-ActiveState --> RenderHeader["Render header with user info"]
+ActiveState --> RenderDesktop["Render desktop sidebar (lg+)"]
+ActiveState --> RenderMobile["Render mobile drawer (sm-)"]
+RenderDesktop --> RenderHeader["Render header with user info"]
+RenderMobile --> RenderHeader
 RenderHeader --> RenderOutlet["Render Outlet for nested page"]
 Redirect --> End(["Exit"])
 RenderOutlet --> End
@@ -191,10 +210,13 @@ RenderOutlet --> End
 **Diagram sources**
 - [Layout.jsx:12-20](file://src/components/Layout.jsx#L12-L20)
 - [Layout.jsx:7-12](file://src/components/Layout.jsx#L7-L12)
+- [Layout.jsx:69-93](file://src/components/Layout.jsx#L69-L93)
 
 **Section sources**
 - [Layout.jsx:7-20](file://src/components/Layout.jsx#L7-L20)
 - [Layout.jsx:12-20](file://src/components/Layout.jsx#L12-L20)
+- [Layout.jsx:69-93](file://src/components/Layout.jsx#L69-L93)
+- [Layout.jsx:107-129](file://src/components/Layout.jsx#L107-L129)
 
 ### AuthLayout Component
 Responsibilities:
@@ -211,17 +233,19 @@ Integration:
 - [App.jsx:24-27](file://src/App.jsx#L24-L27)
 
 ### Role-Based Navigation Filtering
-**Updated**: The navigation system now implements dynamic filtering based on user roles:
+**Updated**: The navigation system now implements dynamic filtering based on user roles with responsive considerations:
 
 - **Administrative Users** (`canEdit = true`): See full navigation including "Manage Members"
 - **Team Members** (`canEdit = false`): See restricted navigation without "Manage Members"
 - **Dynamic Rendering**: Uses JavaScript spread operator to conditionally include navigation items
 - **Access Control Logic**: Controlled by `canEdit` property from the store
+- **Responsive Design**: Navigation filtering works seamlessly across desktop and mobile views
 
 Implementation details:
 - `canEdit` is calculated from `isAdmin` which considers both actual admin profiles and demo mode
 - The "Manage Members" item is conditionally included using `(canEdit ? [...] : [])` syntax
 - This approach maintains clean separation between admin and team member interfaces
+- Works consistently across both desktop and mobile navigation systems
 
 **Section sources**
 - [Layout.jsx:12-20](file://src/components/Layout.jsx#L12-L20)
@@ -232,12 +256,14 @@ Implementation details:
 - Active state is determined by strict equality of location.pathname against item.path
 - Styling toggles between active and hover states using cn
 - **Updated**: Navigation items are now dynamically filtered based on user roles
+- **Updated**: Works seamlessly with both desktop and mobile navigation systems
 
 Extensibility tips:
 - Add new items to NAV_ITEMS with appropriate Lucide icon and path
 - Ensure routes exist under Layout for the new path
 - Keep label and path aligned with page semantics
 - **Updated**: Consider role-based access when adding new navigation items
+- **Updated**: Ensure new items work well with responsive design
 
 **Section sources**
 - [Layout.jsx:12-20](file://src/components/Layout.jsx#L12-L20)
@@ -249,6 +275,7 @@ Behavior:
 - AuthLayout wraps public pages and does not enforce authentication checks itself
 - On logout, store.logout clears session and data, and Layout redirects to landing
 - **Updated**: Role-based access control affects which pages are accessible
+- **Updated**: Mobile navigation respects authentication and role-based access control
 
 ```mermaid
 sequenceDiagram
@@ -283,6 +310,7 @@ Comp->>Router : navigate("/landing")
 - Pages receive props via React Router and use store hooks for data/state
 - cn merges Tailwind classes for consistent styling across components
 - **Updated**: Components now receive role-based access control properties like `canEdit`
+- **Updated**: Mobile navigation components receive `isMobile` prop for responsive styling
 
 **Section sources**
 - [Layout.jsx:60-79](file://src/components/Layout.jsx#L60-L79)
@@ -293,11 +321,13 @@ Comp->>Router : navigate("/landing")
 - [Roles.jsx:1-386](file://src/pages/Roles.jsx#L1-L386)
 - [ManageMembers.jsx:1-133](file://src/pages/ManageMembers.jsx#L1-L133)
 
-### Styling Approaches with Tailwind and cn
+### Styling Approases with Tailwind and cn
 - Tailwind utilities define responsive layouts, spacing, colors, and shadows
 - cn merges conditional classes safely, preventing conflicts from repeated utilities
 - Responsive patterns use sm:, md:, lg: prefixes for breakpoints
 - Gradients, shadows, and rounded corners are applied consistently
+- **Updated**: Mobile-specific styling with `lg:` and `sm:` prefixes for responsive design
+- **Updated**: Transition effects for mobile drawer animations
 
 **Section sources**
 - [Layout.jsx:43-125](file://src/components/Layout.jsx#L43-L125)
@@ -307,13 +337,22 @@ Comp->>Router : navigate("/landing")
 - [tailwind.config.js:1-51](file://tailwind.config.js#L1-L51)
 
 ### Mobile Responsiveness and Accessibility
-- Mobile-first responsive classes: hidden sm: hides elements on small screens
-- Sticky header ensures navigation remains usable while scrolling
-- Accessible button and link semantics via native HTML elements
-- Focus states and hover effects improve keyboard and pointer usability
+**Updated**: Comprehensive mobile responsiveness with dual-sidebar architecture:
+
+- **Mobile-First Design**: Mobile drawer with slide-out effects using CSS transforms
+- **Responsive Breakpoints**: Uses `lg:` prefix for desktop layouts, `sm:` for mobile enhancements
+- **Touch-Friendly Navigation**: Large touch targets for mobile menu buttons
+- **Smooth Animations**: 300ms transition duration for drawer slide-out effects
+- **Overlay Background**: Semi-transparent overlay behind mobile drawer for better UX
+- **Sticky Header**: Ensures navigation remains usable while scrolling
+- **Accessible Semantics**: Native HTML elements for buttons and links
+- **Focus States**: Proper focus management for keyboard navigation
+- **Hover Effects**: Enhanced hover states for improved pointer interaction
 
 **Section sources**
 - [Layout.jsx:105-120](file://src/components/Layout.jsx#L105-L120)
+- [Layout.jsx:69-93](file://src/components/Layout.jsx#L69-L93)
+- [Layout.jsx:110-115](file://src/components/Layout.jsx#L110-L115)
 - [Dashboard.jsx:6-19](file://src/pages/Dashboard.jsx#L6-L19)
 - [Volunteers.jsx:124-157](file://src/pages/Volunteers.jsx#L124-L157)
 
@@ -325,6 +364,7 @@ Comp->>Router : navigate("/landing")
 - **Updated**: Role-based access control with `canEdit` property
 - **Updated**: `isAdmin` considers both actual admin profiles and demo mode
 - **Updated**: `isTeamMember` distinguishes between different user types
+- **Updated**: Mobile navigation respects role-based access control
 
 **Section sources**
 - [store.jsx:21-34](file://src/services/store.jsx#L21-L34)
@@ -334,35 +374,45 @@ Comp->>Router : navigate("/landing")
 - [store.jsx:1213-1229](file://src/services/store.jsx#L1213-L1229)
 
 ### Extending the Layout System and Customizing Navigation
-**Updated**: Examples for role-based navigation extension:
+**Updated**: Examples for role-based navigation extension with responsive considerations:
 
-- Add a new navigation item with role-based access:
+- **Add a new navigation item with role-based access**:
   - Extend NAV_ITEMS with icon, label, and path
   - Add a route under Layout for the new path
   - Create or reuse a page component for the route
   - Use `canEdit` prop to control visibility in the page component
   - Ensure routes exist under Layout for the new path
   - Keep label and path aligned with page semantics
+  - **Updated**: Test responsiveness across desktop and mobile views
 
-- Customize active state styling:
+- **Customize active state styling**:
   - Adjust cn conditions in the Link className to change active/hover styles
+  - **Updated**: Ensure styling works well on both desktop and mobile
 
-- Integrate new pages with role-based access:
+- **Integrate new pages with role-based access**:
   - Place page component under src/pages and export named function
   - Add route in App.jsx under Layout with the same path as NAV_ITEMS
   - Use `canEdit` prop to control feature visibility within the page
+  - **Updated**: Test mobile navigation responsiveness
+
+- **Extend mobile navigation features**:
+  - Add mobile-specific styling using `sm:` and `lg:` prefixes
+  - Implement additional mobile-only features
+  - Test drawer functionality and animations
+  - Ensure proper state management for mobile interactions
 
 **Section sources**
 - [Layout.jsx:12-20](file://src/components/Layout.jsx#L12-L20)
 - [App.jsx:29-35](file://src/App.jsx#L29-L35)
 
 ## Dependency Analysis
-The layout system exhibits clear separation of concerns with role-based access control:
+The layout system exhibits clear separation of concerns with role-based access control and comprehensive responsive design:
 - App.jsx orchestrates routing and providers the Store
 - Layout and AuthLayout depend on React Router and the store
 - Pages depend on the store for data and on Layout/AuthLayout for shell
 - cn is a shared utility for class merging
 - **Updated**: Role-based access control is centralized in the store
+- **Updated**: Mobile navigation state management is handled within the Layout component
 
 ```mermaid
 graph LR
@@ -381,18 +431,19 @@ AuthLayout --> Register["Register.jsx"]
 Layout --> CN["cn.js"]
 AuthLayout --> CN
 Store --> RoleAccess["Role-based Access Control"]
+Store --> MobileState["Mobile State Management"]
 ```
 
 **Diagram sources**
 - [App.jsx:1-43](file://src/App.jsx#L1-L43)
-- [Layout.jsx:1-129](file://src/components/Layout.jsx#L1-L129)
+- [Layout.jsx:1-194](file://src/components/Layout.jsx#L1-L194)
 - [AuthLayout.jsx:1-26](file://src/components/AuthLayout.jsx#L1-L26)
 - [store.jsx:1-1279](file://src/services/store.jsx#L1-L1279)
 - [cn.js:1-7](file://src/utils/cn.js#L1-L7)
 
 **Section sources**
 - [App.jsx:1-43](file://src/App.jsx#L1-L43)
-- [Layout.jsx:1-129](file://src/components/Layout.jsx#L1-L129)
+- [Layout.jsx:1-194](file://src/components/Layout.jsx#L1-L194)
 - [AuthLayout.jsx:1-26](file://src/components/AuthLayout.jsx#L1-L26)
 - [store.jsx:1-1279](file://src/services/store.jsx#L1-L1279)
 - [cn.js:1-7](file://src/utils/cn.js#L1-L7)
@@ -403,6 +454,9 @@ Store --> RoleAccess["Role-based Access Control"]
 - cn minimizes class conflicts and improves maintainability without runtime overhead
 - Outlet-based rendering keeps layout lightweight and composable
 - **Updated**: Role-based navigation filtering is computed efficiently during render
+- **Updated**: Mobile drawer state management uses efficient React hooks
+- **Updated**: CSS transform animations provide smooth mobile navigation experience
+- **Updated**: Responsive design uses Tailwind's built-in optimization features
 
 ## Troubleshooting Guide
 Common issues and resolutions:
@@ -417,18 +471,27 @@ Common issues and resolutions:
   - Check Tailwind config for custom colors and utilities
 - Logout not clearing state:
   - Confirm store.logout invokes Supabase signOut and clears local state
+- **Updated**: Mobile navigation not working:
+  - Verify mobile menu state management with `mobileMenuOpen` hook
+  - Check CSS transform classes for mobile drawer
+  - Ensure proper event handlers for mobile menu buttons
 - **Updated**: Navigation items not appearing for certain users:
   - Verify user profile role in the database
   - Check that `canEdit` property is correctly calculated
   - Ensure role-based access control logic is functioning properly
+- **Updated**: Mobile drawer animation issues:
+  - Verify transform classes and transition durations
+  - Check z-index values for proper stacking order
+  - Ensure overlay background click handlers work correctly
 
 **Section sources**
 - [Layout.jsx:22-31](file://src/components/Layout.jsx#L22-L31)
+- [Layout.jsx:34-37](file://src/components/Layout.jsx#L34-L37)
 - [store.jsx:1213-1229](file://src/services/store.jsx#L1213-L1229)
 - [cn.js:4-6](file://src/utils/cn.js#L4-L6)
 
 ## Conclusion
-RosterFlow's layout system cleanly separates authenticated and unauthenticated flows with sophisticated role-based access control. The Layout component provides a robust shell with responsive design, active state detection, dynamic navigation filtering, and consistent styling via cn. The role-based access control system ensures that administrative users see full functionality while team members see a restricted interface. Extending the system involves adding items to NAV_ITEMS, routes under Layout, corresponding page components with role-based access control, and leveraging the centralized store for authentication and authorization.
+RosterFlow's layout system cleanly separates authenticated and unauthenticated flows with sophisticated role-based access control and comprehensive responsive design. The Layout component provides a robust shell with dual-sidebar architecture, responsive mobile navigation, active state detection, dynamic navigation filtering, and consistent styling via cn. The role-based access control system ensures that administrative users see full functionality while team members see a restricted interface. The mobile navigation system features smooth slide-out effects and proper state management for an optimal user experience across all devices. Extending the system involves adding items to NAV_ITEMS, routes under Layout, corresponding page components with role-based access control, and leveraging the centralized store for authentication and authorization.
 
 ## Appendices
 
@@ -439,6 +502,7 @@ Steps:
 - Create a page component under src/pages
 - Use `canEdit` prop to control visibility within the page component
 - Ensure the page renders inside Outlet
+- **Updated**: Test responsiveness across desktop and mobile views
 
 **Section sources**
 - [Layout.jsx:12-20](file://src/components/Layout.jsx#L12-L20)
@@ -446,6 +510,7 @@ Steps:
 
 ### Example: Customizing Active State Styles
 Adjust the cn condition inside the Link className to modify active and hover styles.
+**Updated**: Ensure styling works well on both desktop and mobile breakpoints.
 
 **Section sources**
 - [Layout.jsx:68-73](file://src/components/Layout.jsx#L68-L73)
@@ -465,8 +530,22 @@ Steps for creating a new role-aware feature:
 3. Conditionally render features based on `canEdit` value
 4. Add the corresponding navigation item to NAV_ITEMS with role-based filtering
 5. Test both admin and team member access scenarios
+6. **Updated**: Verify mobile navigation responsiveness for the new feature
 
 **Section sources**
 - [App.jsx:29-35](file://src/App.jsx#L29-L35)
 - [store.jsx:1213-1229](file://src/services/store.jsx#L1213-L1229)
 - [ManageMembers.jsx:9-24](file://src/pages/ManageMembers.jsx#L9-L24)
+
+### Example: Enhancing Mobile Navigation Experience
+Steps for improving mobile navigation:
+1. Add mobile-specific styling using `sm:` and `lg:` prefixes
+2. Implement additional mobile-only features
+3. Test drawer functionality and animations
+4. Ensure proper state management for mobile interactions
+5. Verify overlay background and click-outside-to-close functionality
+6. Test smooth slide-out animations and transition effects
+
+**Section sources**
+- [Layout.jsx:69-93](file://src/components/Layout.jsx#L69-L93)
+- [Layout.jsx:110-115](file://src/components/Layout.jsx#L110-L115)

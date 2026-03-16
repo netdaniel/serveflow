@@ -3,6 +3,7 @@ import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { Layout as LayoutIcon, Users, Calendar, Settings, LogOut, ShieldCheck, Menu, X } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { useStore } from '../services/store';
+import { NotificationBell } from './NotificationBell';
 
 export function Layout() {
     const location = useLocation();
@@ -118,6 +119,9 @@ export function Layout() {
                         </h2>
                     </div>
                     <div className="flex items-center gap-3">
+                        {/* Notification Bell */}
+                        <NotificationBell />
+                        
                         <div className="text-right hidden sm:block">
                             <p className="text-sm font-medium text-navy-500">{user?.name || 'User'}</p>
                             <p className="text-xs text-navy-400">{canEdit ? 'Admin' : 'Team Member'}</p>
